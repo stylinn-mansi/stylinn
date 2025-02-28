@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "framework": "static",
   "outputDirectory": "build/web",
   "routes": [
     { "src": "/assets/(.*)", "dest": "/assets/$1" },
