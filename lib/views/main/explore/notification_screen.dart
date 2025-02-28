@@ -3,13 +3,54 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/themes.dart';
 import 'explore_screen.dart';
 
+// Create a new provider for notification items
+final notificationItemsProvider = StateProvider<List<Map<String, dynamic>>>((ref) => [
+  {
+    'id': '1',
+    'type': 'friend_request',
+    'username': 'fashion_forward',
+    'userImage': 'https://i.pravatar.cc/150?img=11',
+    'timeAgo': '2h',
+    'isRead': false,
+  },
+  {
+    'id': '2',
+    'type': 'reaction',
+    'username': 'trendsetter',
+    'userImage': 'https://i.pravatar.cc/150?img=12',
+    'reaction': '❤️',
+    'postId': '1',
+    'timeAgo': '5h',
+    'isRead': false,
+  },
+  {
+    'id': '3',
+    'type': 'comment',
+    'username': 'style_guru',
+    'userImage': 'https://i.pravatar.cc/150?img=13',
+    'comment': 'Love this look! Where did you get that top?',
+    'postId': '2',
+    'timeAgo': '1d',
+    'isRead': true,
+  },
+  {
+    'id': '4',
+    'type': 'share',
+    'username': 'fashion_enthusiast',
+    'userImage': 'https://i.pravatar.cc/150?img=14',
+    'postId': '3',
+    'timeAgo': '2d',
+    'isRead': true,
+  },
+]);
+
 class NotificationScreen extends ConsumerWidget {
   const NotificationScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Get notifications from provider
-    final notifications = ref.watch(notificationsProvider);
+    final notifications = ref.watch(notificationItemsProvider);
     
     return Scaffold(
       backgroundColor: Colors.white,
@@ -35,7 +76,10 @@ class NotificationScreen extends ConsumerWidget {
                 return {...notification, 'isRead': true};
               }).toList();
               
-              ref.read(notificationsProvider.notifier).state = updatedNotifications;
+              ref.read(notificationItemsProvider.notifier).state = updatedNotifications;
+              
+              // Update the unread count to 0
+              ref.read(notificationsProvider.notifier).state = 0;
             },
             child: Text(
               'Mark all as read',
@@ -135,7 +179,7 @@ class NotificationScreen extends ConsumerWidget {
       onTap: () {
         // Mark as read when tapped
         if (!isRead) {
-          final notifications = ref.read(notificationsProvider);
+          final notifications = ref.read(notificationItemsProvider);
           final index = notifications.indexWhere((n) => n['id'] == notification['id']);
           
           if (index != -1) {
@@ -145,7 +189,11 @@ class NotificationScreen extends ConsumerWidget {
               'isRead': true,
             };
             
-            ref.read(notificationsProvider.notifier).state = updatedNotifications;
+            ref.read(notificationItemsProvider.notifier).state = updatedNotifications;
+            
+            // Update the unread count
+            final unreadCount = updatedNotifications.where((n) => n['isRead'] == false).length;
+            ref.read(notificationsProvider.notifier).state = unreadCount;
           }
         }
         
@@ -171,7 +219,7 @@ class NotificationScreen extends ConsumerWidget {
           children: [
             CircleAvatar(
               radius: 24,
-              backgroundImage: AssetImage(notification['userImage']),
+              backgroundImage: NetworkImage(notification['userImage']),
             ),
             const SizedBox(width: 16),
             Expanded(

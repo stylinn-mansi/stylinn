@@ -4,25 +4,25 @@ import 'google_fonts_typography.dart';
 class AppTheme {
   
   // Color constants
-  static const Color primaryGold = Color(0xffF84889);
-  static const Color secondaryGold = Color(0xFFBFA054);
-  static const Color darkPrimary = Color(0xFFFFECF3); // Main background (light pink)
+  static const Color primaryGold = Color(0xFF8A2BE2); // Changed to royal purple
+  static const Color secondaryGold = Color(0xFF9370DB); // Changed to medium purple
+  static const Color darkPrimary = Color(0xFFF8F0FF); // Changed to very light purple background
   static const Color darkSecondary =
       Color(0xFFE8E8E8); // Secondary background (light gray)
   static const Color darkTertiary =
       Color(0xFFDDDDDD); // Tertiary background (lighter gray)
   static const Color lightText = Color(0xFF1A1A1A); // Primary text (dark)
   static const Color appBarColor = Color(0xFF1A1A1A); // App bars (black)
-  static const Color buttonColor = Color(0xFFD6A499); // Buttons (black)
+  static const Color buttonColor = Color(0xFF9370DB); // Changed to medium purple
 
   // Gradients
   static const LinearGradient goldGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [
-      Color(0xFFD6A499),
-      Color(0xFFD6A499),
-      Color(0xFFD6A499),
+      Color(0xFF8A2BE2), // Royal purple
+      Color(0xFF9370DB), // Medium purple
+      Color(0xFFA280E9), // Light purple
     ],
   );
 
@@ -91,7 +91,7 @@ class AppTheme {
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: buttonColor,
-        foregroundColor: primaryGold,
+        foregroundColor: Colors.white,
         elevation: 8,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:iconsax/iconsax.dart';
 import '../../core/themes.dart';
 import 'wardrobe/wardrobe_screen.dart';
 import 'explore/explore_screen.dart';
@@ -36,50 +37,52 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          border: Border(
-            top: BorderSide(
-              color: Colors.grey[200]!,
-              width: 1,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, -5),
             ),
+          ],
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
           ),
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
+            padding: const EdgeInsets.symmetric(vertical: 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _NavBarItem(
-                  icon: Icons.checkroom_outlined,
-                  selectedIcon: Icons.checkroom,
+                  icon: Iconsax.shop,
+                  selectedIcon: Iconsax.shop,
                   label: 'Wardrobe',
                   isSelected: selectedTab == 0,
                   onTap: () => ref.read(selectedTabProvider.notifier).state = 0,
                 ),
                 _NavBarItem(
-                  icon: Icons.explore_outlined,
-                  selectedIcon: Icons.explore,
+                  icon: Iconsax.search_normal,
+                  selectedIcon: Iconsax.search_normal,
                   label: 'Explore',
                   isSelected: selectedTab == 1,
                   onTap: () => ref.read(selectedTabProvider.notifier).state = 1,
                 ),
-                _NavBarItem(
-                  icon: Icons.add_circle_outline,
-                  selectedIcon: Icons.add_circle,
-                  label: 'Add',
-                  isSelected: selectedTab == 2,
+                _AINavBarItem(
                   onTap: () => ref.read(selectedTabProvider.notifier).state = 2,
+                  isSelected: selectedTab == 2,
                 ),
                 _NavBarItem(
-                  icon: Icons.shopping_bag_outlined,
-                  selectedIcon: Icons.shopping_bag,
+                  icon: Iconsax.shopping_bag,
+                  selectedIcon: Iconsax.shopping_bag,
                   label: 'Shop',
                   isSelected: selectedTab == 3,
                   onTap: () => ref.read(selectedTabProvider.notifier).state = 3,
                 ),
                 _NavBarItem(
-                  icon: Icons.person_outline,
-                  selectedIcon: Icons.person,
+                  icon: Iconsax.user,
+                  selectedIcon: Iconsax.user,
                   label: 'Profile',
                   isSelected: selectedTab == 4,
                   onTap: () => ref.read(selectedTabProvider.notifier).state = 4,
@@ -120,15 +123,80 @@ class _NavBarItem extends StatelessWidget {
           children: [
             Icon(
               isSelected ? selectedIcon : icon,
-              color: isSelected ? AppTheme.primaryGold : Colors.grey[400],
-              size: 24,
+              color: isSelected ? AppTheme.primaryGold : Colors.black87,
+              size: 22,
             ),
             const SizedBox(height: 4),
             Text(
               label,
               style: TextStyle(
-                color: isSelected ? AppTheme.primaryGold : Colors.grey[400],
-                fontSize: 12,
+                color: isSelected ? AppTheme.primaryGold : Colors.black87,
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AINavBarItem extends StatelessWidget {
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _AINavBarItem({
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: SizedBox(
+        width: 70,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: isSelected
+                      ? [Color(0xFF8A2BE2), Color(0xFF9370DB)]
+                      : [Colors.grey.shade300, Colors.grey.shade200],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                          color: Color(0xFF8A2BE2).withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        )
+                      ]
+                    : [],
+              ),
+              child: Center(
+                child: Icon(
+                  Icons.auto_fix_high,
+                  color: isSelected ? Colors.white : Colors.black54,
+                  size: 22,
+                ),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'AI Style',
+              style: TextStyle(
+                color: isSelected ? AppTheme.primaryGold : Colors.black87,
+                fontSize: 11,
                 fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
               ),
             ),

@@ -1,0 +1,114 @@
+---
+description: 
+globs: .*dart
+alwaysApply: true
+---
+## MVC Architecture with Riverpod
+
+1. **Organize code strictly by MVC pattern**:
+   - `models/`: Data structures and business logic
+   - `views/`: UI components only
+   - `controllers/`: State management with Riverpod providers
+
+2. **Keep each file focused on a single responsibility**:
+   - Model files should only define data structures and conversions
+   - View files should only contain UI rendering logic
+   - Controller files should only manage state and business operations
+
+3. **Limit file size** - if a file exceeds 300 lines, consider splitting it
+
+## Models
+
+1. **Make models immutable** using `freezed` or `equatable` packages
+2. **Implement proper serialization/deserialization** for all models
+3. **Use factory constructors** for creating models from external data
+4. **Include documentation** for complex model properties
+5. **Implement toString()** for easier debugging
+
+## Views
+
+1. **Create pure UI widgets** that receive data via parameters
+2. **Avoid business logic in views** - extract to controllers
+3. **Use ConsumerWidget or ConsumerStatefulWidget** for Riverpod integration
+4. **Minimize widget rebuilds** with judicious use of `select`
+5. **Extract reusable components** to separate widget files
+6. **Implement proper error and loading states** in all views
+
+## Controllers (Providers)
+
+1. **Create specific provider types**:
+   - Use `StateNotifierProvider` for mutable state
+   - Use `FutureProvider` for async operations
+   - Use `Provider` for computed/derived values
+   - Use `StreamProvider` for reactive data sources
+
+2. **Keep providers focused and granular**:
+   - One state notifier class per logical feature
+   - Create "family" providers for parameterized state
+
+3. **Properly scope providers** using `autoDispose` when appropriate
+4. **Organize providers in dedicated files** by feature
+5. **Document provider dependencies** and usage requirements
+
+## Riverpod Best Practices
+
+1. **Use .select() to minimize rebuilds** when consuming large state objects
+2. **Leverage ref.watch() for dependent providers**
+3. **Use ref.read() only in callbacks**, not during build
+4. **Implement proper error handling** with AsyncValue
+5. **Use provider overrides for testing**
+
+## Naming Conventions
+
+1. **Provider naming**:
+   - StateNotifierProvider: `[feature]Provider`
+   - StateNotifier class: `[Feature]Controller` or `[Feature]Notifier`
+   - State class: `[Feature]State`
+
+2. **File naming**:
+   - Controllers: `[feature]_controller.dart`
+   - Models: `[feature]_model.dart`
+   - Views: `[feature]_screen.dart` or `[feature]_widget.dart`
+
+3. **Use consistent casing**:
+   - camelCase for variables, methods, and providers
+   - PascalCase for classes
+   - snake_case for file names
+
+## State Management
+
+1. **Create explicitly defined state classes** for each feature
+2. **Handle loading, error, and success states** using `AsyncValue<T>`
+3. **Implement immutable state updates** in your notifiers
+4. **Keep state normalized** to avoid duplication
+5. **Separate UI state from domain state** when appropriate
+
+## Dependency Injection
+
+1. **Use providers for dependency injection**
+2. **Create service providers** for external dependencies
+3. **Mock dependencies for testing** using `ProviderContainer`
+4. **Override providers for different environments** (dev, prod, test)
+
+## Error Handling
+
+1. **Use AsyncValue for all async operations**
+2. **Propagate errors through providers**
+3. **Handle errors at the UI level** with proper user feedback
+4. **Log errors appropriately** for debugging
+
+
+## Performance
+
+1. **Minimize provider dependencies** to reduce unnecessary rebuilds
+2. **Use .select() to watch specific state properties**
+3. **Implement pagination** for large data sets
+4. **Cache expensive computations** with memoization providers
+5. **Profile and optimize** critical code paths
+
+## Documentation
+
+1. **Document all providers** with their purpose and dependencies
+2. **Add examples for complex state transitions**
+3. **Document widget parameters** and expected behavior
+4. **Include TODO/FIXME comments** for work in progress

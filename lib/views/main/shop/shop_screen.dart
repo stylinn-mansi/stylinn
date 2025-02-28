@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/themes.dart';
 import 'product_details_screen.dart';
-import 'dart:math' as math;
 
 class ShopScreen extends ConsumerStatefulWidget {
   const ShopScreen({super.key});
@@ -11,14 +10,15 @@ class ShopScreen extends ConsumerStatefulWidget {
   ConsumerState<ShopScreen> createState() => _ShopScreenState();
 }
 
-class _ShopScreenState extends ConsumerState<ShopScreen> with SingleTickerProviderStateMixin {
+class _ShopScreenState extends ConsumerState<ShopScreen>
+    with SingleTickerProviderStateMixin {
   String _selectedCategory = 'All';
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   bool _isSearching = false;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
-  
+
   final List<Map<String, dynamic>> _categories = [
     {'name': 'All', 'logo': null},
     {'name': 'Nike', 'logo': 'assets/images/brands/nike.png'},
@@ -33,7 +33,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> with SingleTickerProvid
     {
       'name': 'Premium Cotton T-Shirt',
       'brand': 'Nike',
-      'price': 29.99,
+      'price': 2499,
       'rating': 4.5,
       'reviews': 128,
       'image': 'assets/images/top.png',
@@ -43,11 +43,13 @@ class _ShopScreenState extends ConsumerState<ShopScreen> with SingleTickerProvid
       'isFavorite': false,
       'isNew': true,
       'discount': 0,
+      'category': 'Tops',
+      'isTrending': true,
     },
     {
       'name': 'Floral Summer Dress',
       'brand': 'Zara',
-      'price': 79.99,
+      'price': 5999,
       'rating': 4.8,
       'reviews': 256,
       'image': 'assets/images/dress.png',
@@ -57,11 +59,13 @@ class _ShopScreenState extends ConsumerState<ShopScreen> with SingleTickerProvid
       'isFavorite': true,
       'isNew': false,
       'discount': 15,
+      'category': 'Dresses',
+      'isTrending': false,
     },
     {
       'name': 'Classic Denim Jeans',
       'brand': 'H&M',
-      'price': 59.99,
+      'price': 3999,
       'rating': 4.3,
       'reviews': 189,
       'image': 'assets/images/top1.png',
@@ -71,11 +75,13 @@ class _ShopScreenState extends ConsumerState<ShopScreen> with SingleTickerProvid
       'isFavorite': false,
       'isNew': false,
       'discount': 0,
+      'category': 'Bottoms',
+      'isTrending': false,
     },
     {
       'name': 'Casual Sneakers',
       'brand': 'Adidas',
-      'price': 89.99,
+      'price': 7999,
       'rating': 4.6,
       'reviews': 210,
       'image': 'assets/images/dress1.png',
@@ -85,11 +91,13 @@ class _ShopScreenState extends ConsumerState<ShopScreen> with SingleTickerProvid
       'isFavorite': false,
       'isNew': true,
       'discount': 10,
+      'category': 'Footwear',
+      'isTrending': true,
     },
     {
       'name': 'Sport Track Pants',
       'brand': 'Fila',
-      'price': 49.99,
+      'price': 3499,
       'rating': 4.2,
       'reviews': 156,
       'image': 'assets/images/top.png',
@@ -99,6 +107,8 @@ class _ShopScreenState extends ConsumerState<ShopScreen> with SingleTickerProvid
       'isFavorite': false,
       'isNew': false,
       'discount': 5,
+      'category': 'Activewear',
+      'isTrending': false,
     },
   ];
 
@@ -128,41 +138,43 @@ class _ShopScreenState extends ConsumerState<ShopScreen> with SingleTickerProvid
 
   List<Map<String, dynamic>> get _filteredProducts {
     List<Map<String, dynamic>> result = _products;
-    
+
     // Filter by category
     if (_selectedCategory != 'All') {
-      result = result.where((product) => product['brand'] == _selectedCategory).toList();
+      result = result
+          .where((product) => product['brand'] == _selectedCategory)
+          .toList();
     }
-    
+
     // Filter by search query
     if (_searchController.text.isNotEmpty) {
       final query = _searchController.text.toLowerCase();
-      result = result.where((product) => 
-        product['name'].toLowerCase().contains(query) || 
-        product['brand'].toLowerCase().contains(query)
-      ).toList();
+      result = result
+          .where((product) =>
+              product['name'].toLowerCase().contains(query) ||
+              product['brand'].toLowerCase().contains(query))
+          .toList();
     }
-    
+
     return result;
   }
 
   void _toggleFavorite(int index) {
     final productName = _filteredProducts[index]['name'];
     final productIndex = _products.indexWhere((p) => p['name'] == productName);
-    
+
     if (productIndex != -1) {
       setState(() {
-        _products[productIndex]['isFavorite'] = !_products[productIndex]['isFavorite'];
+        _products[productIndex]['isFavorite'] =
+            !_products[productIndex]['isFavorite'];
       });
-      
+
       // Show a snackbar
       final isFavorite = _products[productIndex]['isFavorite'];
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            isFavorite 
-                ? 'Added to favorites' 
-                : 'Removed from favorites',
+            isFavorite ? 'Added to favorites' : 'Removed from favorites',
           ),
           duration: const Duration(seconds: 1),
           behavior: SnackBarBehavior.floating,
@@ -210,20 +222,11 @@ class _ShopScreenState extends ConsumerState<ShopScreen> with SingleTickerProvid
                     : Row(
                         children: [
                           Text(
-                            'Discover',
+                            'Stylinn',
                             style: TextStyle(
                               color: Colors.black87,
                               fontWeight: FontWeight.bold,
-                              fontSize: 24,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'Fashion',
-                            style: TextStyle(
-                              color: AppTheme.primaryGold,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 24,
+                              fontSize: 22,
                             ),
                           ),
                         ],
@@ -243,38 +246,14 @@ class _ShopScreenState extends ConsumerState<ShopScreen> with SingleTickerProvid
                       });
                     },
                   ),
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      IconButton(
-                        icon: const Icon(
-                          Icons.shopping_bag_outlined,
-                          color: Colors.black,
-                        ),
-                        onPressed: () {
-                          // Navigate to cart
-                        },
-                      ),
-                      Positioned(
-                        top: 10,
-                        right: 10,
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: AppTheme.primaryGold,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Text(
-                            '2',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                  IconButton(
+                    icon: const Icon(
+                      Icons.shopping_bag_outlined,
+                      color: Colors.black,
+                    ),
+                    onPressed: () {
+                      // Navigate to cart
+                    },
                   ),
                 ],
               ),
@@ -285,48 +264,120 @@ class _ShopScreenState extends ConsumerState<ShopScreen> with SingleTickerProvid
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 16),
-                      // Featured Banner with PageView
-                      SizedBox(
-                        height: 220,
-                        child: PageView(
+                      // AI Stylist Banner
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
                           children: [
-                            _buildPromoBanner(
-                              title: 'Summer\nCollection',
-                              subtitle: 'Up to 30% off',
-                              image: 'assets/images/dress.png',
-                              color: AppTheme.primaryGold.withOpacity(0.1),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Message AI Stylist to get outfit you\'re dreaming of',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  ElevatedButton(
+                                    onPressed: () {},
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.red[400],
+                                      foregroundColor: Colors.white,
+                                      elevation: 0,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(24),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 10,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Text('GET OUTFIT'),
+                                        const SizedBox(width: 4),
+                                        Icon(
+                                          Icons.arrow_forward,
+                                          size: 16,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                            _buildPromoBanner(
-                              title: 'New\nArrivals',
-                              subtitle: 'Check out the latest styles',
-                              image: 'assets/images/top.png',
-                              color: Colors.blue.withOpacity(0.1),
+                            const SizedBox(width: 12),
+                            Container(
+                              width: 80,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Stack(
+                                children: [
+                                  Positioned(
+                                    left: 10,
+                                    top: 10,
+                                    child: Container(
+                                      width: 40,
+                                      height: 60,
+                                      color: Colors.grey[300],
+                                    ),
+                                  ),
+                                  Positioned(
+                                    right: 10,
+                                    bottom: 10,
+                                    child: Container(
+                                      width: 30,
+                                      height: 30,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[400],
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
                       ),
                       const SizedBox(height: 24),
-                      // Section Title
+                      // Top Trends Section
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
-                            'Popular Brands',
+                            'Top Trends for You',
                             style: TextStyle(
                               fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w600,
                               color: Colors.black87,
                             ),
                           ),
                           TextButton(
-                            onPressed: () {
-                              // View all brands
-                            },
+                            onPressed: () {},
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                              minimumSize: Size(50, 30),
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
                             child: Text(
-                              'View All',
+                              'View all',
                               style: TextStyle(
-                                color: AppTheme.primaryGold,
-                                fontWeight: FontWeight.w500,
+                                color: Colors.grey[700],
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
                               ),
                             ),
                           ),
@@ -361,18 +412,18 @@ class _ShopScreenState extends ConsumerState<ShopScreen> with SingleTickerProvid
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Container(
-                                width: 70,
-                                height: 70,
+                                width: 60,
+                                height: 60,
                                 decoration: BoxDecoration(
-                                  color: isSelected 
+                                  color: isSelected
                                       ? AppTheme.primaryGold.withOpacity(0.1)
                                       : Colors.grey[100],
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                    color: isSelected 
-                                        ? AppTheme.primaryGold 
+                                    color: isSelected
+                                        ? AppTheme.primaryGold
                                         : Colors.transparent,
-                                    width: 2,
+                                    width: 1,
                                   ),
                                 ),
                                 child: category['logo'] != null
@@ -385,21 +436,21 @@ class _ShopScreenState extends ConsumerState<ShopScreen> with SingleTickerProvid
                                       )
                                     : Icon(
                                         Icons.apps,
-                                        color: isSelected 
-                                            ? AppTheme.primaryGold 
+                                        color: isSelected
+                                            ? AppTheme.primaryGold
                                             : Colors.grey[600],
-                                        size: 30,
+                                        size: 24,
                                       ),
                               ),
                               const SizedBox(height: 8),
                               Text(
                                 category['name'],
                                 style: TextStyle(
-                                  color: isSelected 
-                                      ? AppTheme.primaryGold 
+                                  color: isSelected
+                                      ? AppTheme.primaryGold
                                       : Colors.black87,
-                                  fontWeight: isSelected 
-                                      ? FontWeight.bold 
+                                  fontWeight: isSelected
+                                      ? FontWeight.bold
                                       : FontWeight.normal,
                                   fontSize: 12,
                                 ),
@@ -409,85 +460,6 @@ class _ShopScreenState extends ConsumerState<ShopScreen> with SingleTickerProvid
                         ),
                       );
                     },
-                  ),
-                ),
-              ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        _selectedCategory == 'All' 
-                            ? 'All Products' 
-                            : '$_selectedCategory Products',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[100],
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.sort,
-                                  size: 16,
-                                  color: Colors.grey[700],
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'Sort',
-                                  style: TextStyle(
-                                    color: Colors.grey[700],
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[100],
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.filter_list,
-                                  size: 16,
-                                  color: Colors.grey[700],
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'Filter',
-                                  style: TextStyle(
-                                    color: Colors.grey[700],
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
                   ),
                 ),
               ),
@@ -548,9 +520,10 @@ class _ShopScreenState extends ConsumerState<ShopScreen> with SingleTickerProvid
                   opacity: _fadeAnimation,
                   child: GridView.builder(
                     padding: const EdgeInsets.all(16),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
-                      childAspectRatio: 0.65,
+                      childAspectRatio: 0.56,
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
                     ),
@@ -575,7 +548,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> with SingleTickerProvid
     return Container(
       margin: const EdgeInsets.only(right: 8),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         color: color,
       ),
       child: Stack(
@@ -590,7 +563,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> with SingleTickerProvid
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(20.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -598,7 +571,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> with SingleTickerProvid
                 Text(
                   title,
                   style: const TextStyle(
-                    fontSize: 24,
+                    fontSize: 22,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
                   ),
@@ -617,6 +590,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> with SingleTickerProvid
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.primaryGold,
                     foregroundColor: Colors.white,
+                    elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -631,13 +605,13 @@ class _ShopScreenState extends ConsumerState<ShopScreen> with SingleTickerProvid
             ),
           ),
           Positioned(
-            bottom: 16,
-            right: 16,
+            bottom: 12,
+            right: 12,
             child: Row(
               children: [
                 Container(
-                  width: 8,
-                  height: 8,
+                  width: 6,
+                  height: 6,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: AppTheme.primaryGold,
@@ -645,8 +619,8 @@ class _ShopScreenState extends ConsumerState<ShopScreen> with SingleTickerProvid
                 ),
                 const SizedBox(width: 4),
                 Container(
-                  width: 8,
-                  height: 8,
+                  width: 6,
+                  height: 6,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: Colors.grey[400],
@@ -662,268 +636,132 @@ class _ShopScreenState extends ConsumerState<ShopScreen> with SingleTickerProvid
 
   Widget _buildProductCard(Map<String, dynamic> product, int index) {
     final bool hasDiscount = product['discount'] > 0;
-    final double discountedPrice = product['price'] * (1 - product['discount'] / 100);
-    
-    return Hero(
-      tag: 'product_${product['name']}',
-      child: Material(
-        color: Colors.transparent,
-        child: GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ProductDetailsScreen(product: product),
+    final double discountedPrice =
+        product['price'] * (1 - product['discount'] / 100);
+    final bool isTrending = product['isTrending'] ?? false;
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProductDetailsScreen(product: product),
+          ),
+        );
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Product Image
+          Stack(
+            children: [
+              AspectRatio(
+                aspectRatio: 0.80,
+                child: Container(
+                  padding: EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.grey[100],
+                    image: DecorationImage(
+                      image: AssetImage(
+                        product['image'],
+                      ),
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
               ),
-            );
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Product Image
-                Expanded(
-                  child: Stack(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(16),
-                          ),
-                          image: DecorationImage(
-                            image: AssetImage(product['image']),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      if (product['isNew'])
-                        Positioned(
-                          top: 12,
-                          left: 12,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.green,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: const Text(
-                              'NEW',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                      if (hasDiscount)
-                        Positioned(
-                          top: product['isNew'] ? 40 : 12,
-                          left: 12,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.red,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              '-${product['discount']}%',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                      Positioned(
-                        top: 8,
-                        right: 8,
-                        child: GestureDetector(
-                          onTap: () => _toggleFavorite(index),
-                          child: Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Icon(
-                              product['isFavorite']
-                                  ? Icons.favorite
-                                  : Icons.favorite_border,
-                              color: product['isFavorite']
-                                  ? Colors.red
-                                  : Colors.grey[400],
-                              size: 18,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 8,
-                        right: 8,
-                        child: Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: AppTheme.primaryGold,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: const Icon(
-                            Icons.shopping_bag_outlined,
-                            color: Colors.white,
-                            size: 18,
-                          ),
-                        ),
-                      ),
-                    ],
+              Positioned(
+                top: 8,
+                right: 8,
+                child: GestureDetector(
+                  onTap: () => _toggleFavorite(index),
+                  child: Container(
+                    width: 30,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      color: Colors.transparent,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      product['isFavorite']
+                          ? Icons.favorite
+                          : Icons.favorite_border,
+                      color: product['isFavorite'] ? Colors.red : Colors.black,
+                      size: 16,
+                    ),
                   ),
                 ),
-                // Product Info
-                Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            height: 16,
-                            width: 16,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                image: AssetImage(_getBrandLogo(product['brand'])),
-                                fit: BoxFit.contain,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            product['brand'],
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        product['name'],
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+              ),
+              if (product['isTrending'])
+                Positioned(
+                  bottom: 8,
+                  left: 16,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.4),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.local_fire_department,
+                          color: Colors.red[400],
+                          size: 16,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              if (hasDiscount) ...[
-                                Text(
-                                  '\$${product['price'].toStringAsFixed(2)}',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.grey[600],
-                                    decoration: TextDecoration.lineThrough,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                              ],
-                              Text(
-                                hasDiscount
-                                    ? '\$${discountedPrice.toStringAsFixed(2)}'
-                                    : '\$${product['price'].toStringAsFixed(2)}',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: hasDiscount ? Colors.red : AppTheme.primaryGold,
-                                ),
-                              ),
-                            ],
+                        const SizedBox(width: 2),
+                        const Text(
+                          'In Trend',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
                           ),
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.star,
-                                color: Colors.amber,
-                                size: 14,
-                              ),
-                              const SizedBox(width: 2),
-                              Text(
-                                product['rating'].toString(),
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ],
+            ],
+          ),
+          const SizedBox(height: 8),
+          // Brand
+          Text(
+            product['brand'],
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
+              color: Colors.black38,
             ),
           ),
-        ),
+          const SizedBox(height: 4),
+          //Product Name
+          Text(
+            product['name'],
+            maxLines: 1,
+            style: TextStyle(
+              fontSize: 14,
+              overflow: TextOverflow.ellipsis,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          // Price
+          Text(
+            hasDiscount
+                ? '₹${discountedPrice.toInt()}'
+                : '₹${product['price']}',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: hasDiscount ? Colors.red[400] : Colors.black87,
+            ),
+          ),
+        ],
       ),
     );
   }
-  
-  String _getBrandLogo(String brand) {
-    switch (brand) {
-      case 'Nike':
-        return 'assets/images/brands/nike.png';
-      case 'Adidas':
-        return 'assets/images/brands/adidas.png';
-      case 'Zara':
-        return 'assets/images/brands/zara.png';
-      case 'H&M':
-        return 'assets/images/brands/h&m.png';
-      case 'Fila':
-        return 'assets/images/brands/fila.png';
-      default:
-        return 'assets/images/brands/nike.png'; // Default logo
-    }
-  }
-} 
+}

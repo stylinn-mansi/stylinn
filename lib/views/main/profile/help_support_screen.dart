@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/themes.dart';
 
 class HelpSupportScreen extends ConsumerStatefulWidget {
   const HelpSupportScreen({super.key});
@@ -9,327 +8,142 @@ class HelpSupportScreen extends ConsumerStatefulWidget {
   ConsumerState<HelpSupportScreen> createState() => _HelpSupportScreenState();
 }
 
-class _HelpSupportScreenState extends ConsumerState<HelpSupportScreen> {
+class _HelpSupportScreenState extends ConsumerState<HelpSupportScreen> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
   final TextEditingController _searchController = TextEditingController();
-  int _expandedIndex = -1;
+  final TextEditingController _messageController = TextEditingController();
+  bool _isSearching = false;
 
-  // Mock FAQs
-  final List<Map<String, String>> _faqs = [
-    {
-      'question': 'How do I add items to my wardrobe?',
-      'answer': 'To add items to your wardrobe, go to the Wardrobe tab and tap the + button in the bottom right corner. You can then take a photo or select from your gallery, add details about the item, and save it to your wardrobe.'
-    },
-    {
-      'question': 'How do I create an outfit?',
-      'answer': 'To create an outfit, go to the Outfits tab and tap "Create New Outfit". You can then select items from your wardrobe to combine into an outfit. Save it with a name and optional tags for easy reference.'
-    },
-    {
-      'question': 'Can I share my outfits with friends?',
-      'answer': 'Yes! When viewing an outfit, tap the share icon to generate a link or image that you can share via social media, messaging apps, or email.'
-    },
-    {
-      'question': 'How do I get style recommendations?',
-      'answer': 'Style recommendations are automatically generated based on your wardrobe items, style preferences, and body measurements. Make sure to complete your profile and add items to your wardrobe for the best recommendations.'
-    },
-    {
-      'question': 'How do I update my body measurements?',
-      'answer': 'Go to your Profile tab, tap on "Body Measurements", and update your measurements as needed. You can switch between metric and imperial units as well.'
-    },
-    {
-      'question': 'How do I delete my account?',
-      'answer': 'To delete your account, go to Settings > Account > Delete Account. Please note that this action is permanent and all your data will be lost.'
-    },
-  ];
-
-  // Mock contact methods
-  final List<Map<String, dynamic>> _contactMethods = [
-    {
-      'icon': Icons.email_outlined,
-      'title': 'Email Support',
-      'subtitle': 'Get help via email',
-      'action': 'support@stylinn.com',
-    },
-    {
-      'icon': Icons.chat_outlined,
-      'title': 'Live Chat',
-      'subtitle': 'Chat with our support team',
-      'action': 'Start Chat',
-    },
-    {
-      'icon': Icons.phone_outlined,
-      'title': 'Phone Support',
-      'subtitle': 'Call our customer service',
-      'action': '+1 (800) 123-4567',
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+  }
 
   @override
   void dispose() {
+    _tabController.dispose();
     _searchController.dispose();
+    _messageController.dispose();
     super.dispose();
-  }
-
-  List<Map<String, String>> get _filteredFaqs {
-    if (_searchController.text.isEmpty) {
-      return _faqs;
-    }
-    
-    final query = _searchController.text.toLowerCase();
-    return _faqs.where((faq) {
-      return faq['question']!.toLowerCase().contains(query) ||
-          faq['answer']!.toLowerCase().contains(query);
-    }).toList();
   }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
+    return Scaffold(
+      appBar: AppBar(
+        title: _isSearching
+            ? TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: 'Search help topics...',
+                  border: InputBorder.none,
+                  hintStyle: TextStyle(color: Colors.grey[400]),
+                ),
+                style: const TextStyle(color: Colors.black),
+                autofocus: true,
+                onSubmitted: (_) {
+                  setState(() {
+                    _isSearching = false;
+                  });
+                  // Implement search functionality
+                },
+              )
+            : const Text('Help & Support'),
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          title: const Text(
-            'Help & Support',
-            style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-            ),
+        elevation: 0,
+        centerTitle: _isSearching ? false : true,
+        actions: [
+          IconButton(
+            icon: Icon(_isSearching ? Icons.close : Icons.search),
+            onPressed: () {
+              setState(() {
+                _isSearching = !_isSearching;
+                if (!_isSearching) {
+                  _searchController.clear();
+                }
+              });
+            },
           ),
-          backgroundColor: Colors.white,
-          elevation: 0,
-          iconTheme: const IconThemeData(color: Colors.black),
-          bottom: TabBar(
-            labelColor: AppTheme.primaryGold,
-            unselectedLabelColor: Colors.grey[600],
-            indicatorColor: AppTheme.primaryGold,
-            tabs: const [
-              Tab(text: 'FAQs'),
-              Tab(text: 'Contact Us'),
-            ],
-          ),
-        ),
-        body: TabBarView(
-          children: [
-            _buildFaqTab(),
-            _buildContactTab(),
+        ],
+        bottom: TabBar(
+          controller: _tabController,
+          labelColor: Theme.of(context).primaryColor,
+          unselectedLabelColor: Colors.grey,
+          indicatorColor: Theme.of(context).primaryColor,
+          tabs: const [
+            Tab(text: 'FAQs'),
+            Tab(text: 'Support'),
+            Tab(text: 'Guides'),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildFaqTab() {
-    return Column(
-      children: [
-        // Search Bar
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: TextField(
-            controller: _searchController,
-            decoration: InputDecoration(
-              hintText: 'Search FAQs',
-              prefixIcon: const Icon(Icons.search),
-              filled: true,
-              fillColor: Colors.grey[100],
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
-              ),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 14,
-              ),
-            ),
-            onChanged: (value) {
-              setState(() {});
-            },
-          ),
-        ),
-        
-        // FAQ List
-        Expanded(
-          child: _filteredFaqs.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.search_off,
-                        size: 64,
-                        color: Colors.grey[400],
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'No results found',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.grey[600],
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Try a different search term',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[500],
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              : ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: _filteredFaqs.length,
-                  itemBuilder: (context, index) {
-                    return _buildFaqItem(_filteredFaqs[index], index);
-                  },
-                ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildFaqItem(Map<String, String> faq, int index) {
-    final isExpanded = _expandedIndex == index;
-    
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey[200]!),
-      ),
-      child: ExpansionTile(
-        initiallyExpanded: isExpanded,
-        onExpansionChanged: (expanded) {
-          setState(() {
-            _expandedIndex = expanded ? index : -1;
-          });
-        },
-        title: Text(
-          faq['question']!,
-          style: const TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 16,
-          ),
-        ),
-        trailing: Icon(
-          isExpanded ? Icons.remove : Icons.add,
-          color: AppTheme.primaryGold,
-        ),
+      body: TabBarView(
+        controller: _tabController,
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: Text(
-              faq['answer']!,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[700],
-                height: 1.5,
-              ),
-            ),
-          ),
+          _buildFAQsTab(),
+          _buildSupportTab(),
+          _buildGuidesTab(),
         ],
       ),
     );
   }
 
-  Widget _buildContactTab() {
+  Widget _buildFAQsTab() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Contact Methods
-          ...List.generate(
-            _contactMethods.length,
-            (index) => _buildContactMethodItem(_contactMethods[index]),
-          ),
-          const SizedBox(height: 32),
-          
-          // Contact Form
-          const Text(
-            'Send us a message',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-          ),
-          const SizedBox(height: 16),
-          _buildTextField(
-            label: 'Name',
-            hint: 'Enter your name',
-          ),
-          const SizedBox(height: 16),
-          _buildTextField(
-            label: 'Email',
-            hint: 'Enter your email',
-            keyboardType: TextInputType.emailAddress,
-          ),
-          const SizedBox(height: 16),
-          _buildTextField(
-            label: 'Subject',
-            hint: 'What is this regarding?',
-          ),
-          const SizedBox(height: 16),
-          _buildTextField(
-            label: 'Message',
-            hint: 'How can we help you?',
-            maxLines: 5,
-          ),
-          const SizedBox(height: 24),
-          
-          // Submit Button
-          SizedBox(
-            width: double.infinity,
-            height: 56,
-            child: ElevatedButton(
-              onPressed: () {
-                // Submit form
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Message sent successfully')),
-                );
+          _buildFAQCategory(
+            title: 'Account & Profile',
+            faqs: [
+              {
+                'question': 'How do I change my email address?',
+                'answer': 'You can change your email address by going to "My Information" in your profile settings. Tap on the email field, enter your new email address, and save your changes. A verification email will be sent to your new address.'
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primaryGold,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: const Text(
-                'Send Message',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-            ),
+              {
+                'question': 'How do I reset my password?',
+                'answer': 'To reset your password, go to the login screen and tap on "Forgot Password". Enter your email address, and we\'ll send you a link to create a new password.'
+              },
+              {
+                'question': 'How can I delete my account?',
+                'answer': 'To delete your account, go to "My Information" in your profile settings and scroll to the bottom. Tap on "Delete Account" and follow the instructions. Please note that this action is irreversible and all your data will be permanently deleted.'
+              },
+            ],
           ),
-          const SizedBox(height: 32),
-          
-          // Social Media
-          const Text(
-            'Follow us',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
+          _buildFAQCategory(
+            title: 'Style Formula',
+            faqs: [
+              {
+                'question': 'What is a Style Formula?',
+                'answer': 'Your Style Formula is a personalized summary of your fashion preferences, body type, and color analysis. It helps our app provide tailored recommendations that match your unique style and physical characteristics.'
+              },
+              {
+                'question': 'How can I update my Style Formula?',
+                'answer': 'You can update your Style Formula by going to "My Style Formula" in your profile and tapping on "Update Formula". You\'ll be guided through a series of questions to refresh your style preferences.'
+              },
+              {
+                'question': 'Why is my Style Formula important?',
+                'answer': 'Your Style Formula ensures that all recommendations and outfit suggestions are personalized for you. The more accurate your Style Formula, the better our recommendations will be.'
+              },
+            ],
           ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildSocialButton(Icons.facebook, Colors.blue),
-              const SizedBox(width: 24),
-              _buildSocialButton(Icons.camera_alt_outlined, Colors.pink),
-              const SizedBox(width: 24),
-              _buildSocialButton(Icons.tiktok, Colors.black),
-              const SizedBox(width: 24),
-              _buildSocialButton(Icons.play_arrow, Colors.red),
+          _buildFAQCategory(
+            title: 'Subscription',
+            faqs: [
+              {
+                'question': 'How do I manage my subscription?',
+                'answer': 'You can manage your subscription by going to "Manage Subscription" in your profile. There, you can view your current plan, change your subscription, or cancel it.'
+              },
+              {
+                'question': 'What happens if I cancel my subscription?',
+                'answer': 'If you cancel your subscription, you ll continue to have access to premium features until the end of your current billing period. After that, your account will revert to the free plan.'
+              },
+              {
+                'question': 'How do I apply a promo code?',
+                'answer': 'To apply a promo code, go to "Promo Codes" in your profile, enter your code in the input field, and tap "Apply". If valid, the discount will be applied to your next billing cycle.'
+              },
             ],
           ),
         ],
@@ -337,96 +151,44 @@ class _HelpSupportScreenState extends ConsumerState<HelpSupportScreen> {
     );
   }
 
-  Widget _buildContactMethodItem(Map<String, dynamic> method) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey[200]!),
-      ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(16),
-        leading: Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: AppTheme.primaryGold.withOpacity(0.1),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            method['icon'],
-            color: AppTheme.primaryGold,
-          ),
-        ),
-        title: Text(
-          method['title'],
-          style: const TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 16,
-          ),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 4),
-            Text(
-              method['subtitle'],
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 14,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              method['action'],
-              style: TextStyle(
-                color: AppTheme.primaryGold,
-                fontWeight: FontWeight.w500,
-                fontSize: 14,
-              ),
-            ),
-          ],
-        ),
-        onTap: () {
-          // Handle contact method tap
-        },
-      ),
-    );
-  }
-
-  Widget _buildTextField({
-    required String label,
-    required String hint,
-    TextInputType keyboardType = TextInputType.text,
-    int maxLines = 1,
-  }) {
+  Widget _buildFAQCategory({required String title, required List<Map<String, String>> faqs}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: Colors.black87,
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16.0),
+          child: Text(
+            title,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
-        const SizedBox(height: 8),
-        TextField(
-          keyboardType: keyboardType,
-          maxLines: maxLines,
-          decoration: InputDecoration(
-            hintText: hint,
-            filled: true,
-            fillColor: Colors.grey[100],
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 14,
+        ...faqs.map((faq) => _buildFAQItem(faq['question']!, faq['answer']!)),
+        const Divider(height: 32),
+      ],
+    );
+  }
+
+  Widget _buildFAQItem(String question, String answer) {
+    return ExpansionTile(
+      title: Text(
+        question,
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          child: Text(
+            answer,
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[800],
+              height: 1.5,
             ),
           ),
         ),
@@ -434,24 +196,308 @@ class _HelpSupportScreenState extends ConsumerState<HelpSupportScreen> {
     );
   }
 
-  Widget _buildSocialButton(IconData icon, Color color) {
-    return GestureDetector(
-      onTap: () {
-        // Open social media
-      },
-      child: Container(
-        width: 48,
-        height: 48,
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          shape: BoxShape.circle,
+  Widget _buildSupportTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Contact Support',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'Our support team is here to help you with any questions or issues. Please fill out the form below, and we\'ll get back to you as soon as possible.',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey,
+              height: 1.5,
+            ),
+          ),
+          const SizedBox(height: 24),
+          _buildSupportForm(),
+          const SizedBox(height: 32),
+          const Divider(),
+          const SizedBox(height: 24),
+          _buildContactInfo(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSupportForm() {
+    return Form(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          DropdownButtonFormField<String>(
+            decoration: const InputDecoration(
+              labelText: 'Topic',
+              border: OutlineInputBorder(),
+            ),
+            items: const [
+              DropdownMenuItem(value: 'account', child: Text('Account Issues')),
+              DropdownMenuItem(value: 'subscription', child: Text('Subscription Issues')),
+              DropdownMenuItem(value: 'app', child: Text('App Functionality')),
+              DropdownMenuItem(value: 'feedback', child: Text('Feature Feedback')),
+              DropdownMenuItem(value: 'other', child: Text('Other')),
+            ],
+            onChanged: (value) {},
+          ),
+          const SizedBox(height: 16),
+          TextFormField(
+            decoration: const InputDecoration(
+              labelText: 'Subject',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 16),
+          TextFormField(
+            controller: _messageController,
+            decoration: const InputDecoration(
+              labelText: 'Message',
+              border: OutlineInputBorder(),
+              alignLabelWithHint: true,
+            ),
+            maxLines: 5,
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () {
+              // Submit support request
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Support request submitted successfully!'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+              _messageController.clear();
+            },
+            style: ElevatedButton.styleFrom(
+              minimumSize: const Size(double.infinity, 50),
+            ),
+            child: const Text('Submit Request'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContactInfo() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Other Ways to Reach Us',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        child: Icon(
-          icon,
-          color: color,
-          size: 24,
+        const SizedBox(height: 16),
+        _buildContactMethod(
+          icon: Icons.email_outlined,
+          title: 'Email',
+          detail: 'support@stylinn.com',
+          onTap: () {
+            // Open email app
+          },
+        ),
+        _buildContactMethod(
+          icon: Icons.phone_outlined,
+          title: 'Phone',
+          detail: '+1 (800) 555-0123',
+          onTap: () {
+            // Open phone dialer
+          },
+        ),
+        _buildContactMethod(
+          icon: Icons.chat_bubble_outline,
+          title: 'Live Chat',
+          detail: 'Available 9 AM - 5 PM EST, Monday to Friday',
+          onTap: () {
+            // Open live chat
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildContactMethod({
+    required IconData icon,
+    required String title,
+    required String detail,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12.0),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: Theme.of(context).primaryColor),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    detail,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey[400]),
+          ],
         ),
       ),
+    );
+  }
+
+  Widget _buildGuidesTab() {
+    final List<Map<String, dynamic>> guides = [
+      {
+        'title': 'Getting Started with Stylinn',
+        'icon': Icons.star_outline,
+        'color': Colors.amber,
+        'description': 'Learn the basics of the app and how to set up your profile for the best experience.',
+      },
+      {
+        'title': 'Understanding Your Style Formula',
+        'icon': Icons.science_outlined,
+        'color': Colors.purple,
+        'description': 'Deep dive into what your Style Formula means and how it affects recommendations.',
+      },
+      {
+        'title': 'Creating a Digital Wardrobe',
+        'icon': Icons.checkroom_outlined,
+        'color': Colors.blue,
+        'description': 'Step-by-step guide to adding and organizing your clothing items in the app.',
+      },
+      {
+        'title': 'Getting Outfit Recommendations',
+        'icon': Icons.auto_awesome_outlined,
+        'color': Colors.green,
+        'description': 'How to use the app to get personalized outfit recommendations for any occasion.',
+      },
+      {
+        'title': 'Shopping Suggestions',
+        'icon': Icons.shopping_bag_outlined,
+        'color': Colors.red,
+        'description': 'How to use the app to discover new clothing items that match your style.',
+      },
+      {
+        'title': 'Seasonal Wardrobe Transition',
+        'icon': Icons.wb_sunny_outlined,
+        'color': Colors.orange,
+        'description': 'Tips on how to update your wardrobe for different seasons using the app.',
+      },
+    ];
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16.0),
+      itemCount: guides.length,
+      itemBuilder: (context, index) {
+        final guide = guides[index];
+        return Card(
+          margin: const EdgeInsets.only(bottom: 16.0),
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: InkWell(
+            onTap: () {
+              // Navigate to guide detail page
+            },
+            borderRadius: BorderRadius.circular(12),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: guide['color'].withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      guide['icon'],
+                      color: guide['color'],
+                      size: 28,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          guide['title'],
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          guide['description'],
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                            height: 1.5,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Text(
+                              'Read Guide',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Theme.of(context).primaryColor,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Icon(
+                              Icons.arrow_forward,
+                              size: 16,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 } 

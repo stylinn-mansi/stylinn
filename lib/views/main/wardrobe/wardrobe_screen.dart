@@ -14,7 +14,6 @@ class WardrobeScreen extends ConsumerStatefulWidget {
 class _WardrobeScreenState extends ConsumerState<WardrobeScreen> with SingleTickerProviderStateMixin {
   String _selectedCategory = 'All';
   final ScrollController _scrollController = ScrollController();
-  bool _isCollapsed = false;
   late TabController _tabController;
   int _currentTabIndex = 0;
   bool _hasShownTrendingPopup = false;
@@ -45,12 +44,12 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> with SingleTick
   ];
 
   final List<Map<String, dynamic>> _categories = [
-    {'icon': Icons.checkroom_outlined, 'label': 'All'},
-    {'icon': Icons.dry_cleaning_outlined, 'label': 'Tops'},
-    {'icon': Icons.airline_seat_legroom_normal_outlined, 'label': 'Bottoms'},
-    {'icon': Icons.layers_outlined, 'label': 'Outerwear'},
-    {'icon': Icons.shopping_bag_outlined, 'label': 'Shoes'},
-    {'icon': Icons.watch_outlined, 'label': 'Accessories'},
+    {'icon': Icons.all_inclusive, 'label': 'All', 'gradient': const [Color(0xFF9C27B0), Color(0xFF8A2BE2)]},
+    {'icon': Icons.checkroom, 'label': 'Tops', 'gradient': const [Color(0xFF6A1B9A), Color(0xFF8E24AA)]},
+    {'icon': Icons.water_drop, 'label': 'Bottoms', 'gradient': const [Color(0xFF4A148C), Color(0xFF7B1FA2)]},
+    {'icon': Icons.style, 'label': 'Outerwear', 'gradient': const [Color(0xFF6200EA), Color(0xFF3D5AFE)]},
+    {'icon': Icons.diamond, 'label': 'Shoes', 'gradient': const [Color(0xFF673AB7), Color(0xFF3949AB)]},
+    {'icon': Icons.watch, 'label': 'Accessories', 'gradient': const [Color(0xFF5E35B1), Color(0xFF3F51B5)]},
   ];
 
   // Mock clothing items
@@ -217,11 +216,7 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> with SingleTick
   }
 
   void _onScroll() {
-    if (_scrollController.hasClients) {
-      setState(() {
-        _isCollapsed = _scrollController.offset > 200;
-      });
-    }
+    // Keep scroll listener for future use
   }
 
   @override
@@ -241,227 +236,75 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> with SingleTick
             child: const Icon(Icons.add, color: Colors.white),
           )
         : null,
-      body: NestedScrollView(
-        controller: _scrollController,
-        headerSliverBuilder: (context, innerBoxIsScrolled) {
-          return [
-            SliverAppBar(
-              automaticallyImplyLeading: false,
-              expandedHeight: 320, // Increased height to accommodate stats
-              floating: false,
-              pinned: true,
-              backgroundColor: Colors.white,
-              elevation: 0,
-              forceElevated: innerBoxIsScrolled,
-              actions: [
-                IconButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const InsightsScreen(),
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.insights, color: Colors.white),
+      appBar: AppBar(
+        centerTitle: false,
+        automaticallyImplyLeading: false,
+        title: const Text(
+          'Wardrobe',
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.w600,
+            fontSize: 24,
+          ),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const InsightsScreen(),
                 ),
-              ],
-              bottom: PreferredSize(
-                preferredSize: const Size.fromHeight(48),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.grey[300]!,
-                        width: 1,
-                      ),
-                    ),
-                    boxShadow: innerBoxIsScrolled
-                        ? [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ]
-                        : [],
-                  ),
-                  child: TabBar(
-                    controller: _tabController,
-                    labelColor: AppTheme.primaryGold,
-                    unselectedLabelColor: Colors.grey[700],
-                    indicatorColor: Colors.transparent,
-                    dividerColor: Colors.transparent,
-
-                    indicator: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(
-                          color: AppTheme.primaryGold,
-                          width: 3,
-                        ),
-                      ),
-                    
-                    ),
-                    labelStyle: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    tabs: const [
-                      Tab(text: 'Clothes'),
-                      Tab(text: 'Outfits'),
-                    ],
-                  ),
-                ),
-              ),
-              title: AnimatedOpacity(
-                opacity: _isCollapsed ? 1.0 : 0.0,
-                duration: const Duration(milliseconds: 250),
-                child: const Text(
-                  'Wardrobe',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              flexibleSpace: FlexibleSpaceBar(
-                background: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Hero(
-                      tag: 'profile_background',
-                      child: Image.asset(
-                        'assets/images/profile.png',
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.transparent,
-                            Colors.white.withOpacity(0.8),
-                            Colors.white,
-                          ],
-                        ),
-                      ),
-                    ),
-                    SafeArea(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            // Profile Row with Insights Icon
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                             
-                                Hero(
-                                  tag: 'profile_image',
-                                  child: Container(
-                                    width: 80,
-                                    height: 80,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: Colors.white,
-                                        width: 3,
-                                      ),
-                                      image: const DecorationImage(
-                                        image: AssetImage('assets/images/profile.png'),
-                                        fit: BoxFit.cover,
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.1),
-                                          blurRadius: 8,
-                                          offset: const Offset(0, 4),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                
-                               
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-                            const Text(
-                              'Mansi Goel',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black87,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              '@mansi_goel',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                            const SizedBox(height: 24),
-                            Container(
-                              margin: const EdgeInsets.only(bottom: 16),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 24,
-                                vertical: 16,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.05),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  _buildStat('145', 'Items'),
-                                  Container(
-                                    height: 24,
-                                    width: 1,
-                                    color: Colors.grey[300],
-                                  ),
-                                  _buildStat('23', 'Outfits'),
-                                  Container(
-                                    height: 24,
-                                    width: 1,
-                                    color: Colors.grey[300],
-                                  ),
-                                  _buildStat('15', 'Lookbooks'),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+              );
+            },
+            icon: const Icon(Icons.insights, color: Colors.black87),
+          ),
+        ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(48),
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Colors.grey.withOpacity(0.2),
+                  width: 1,
                 ),
               ),
             ),
-          ];
-        },
-        body: TabBarView(
-          controller: _tabController,
-          children: [
-            _buildClothesContent(filteredItems),
-            _buildOutfitsContent(),
-          ],
+            child: TabBar(
+              controller: _tabController,
+              labelColor: AppTheme.primaryGold,
+              unselectedLabelColor: Colors.grey[400],
+              dividerHeight: 0,
+              dividerColor: Colors.transparent,
+              
+              indicatorColor: AppTheme.primaryGold,
+              indicatorWeight: 2,
+              indicatorSize: TabBarIndicatorSize.label,
+              labelStyle: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+              ),
+              unselectedLabelStyle: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+              ),
+              tabs: const [
+                Tab(text: 'Clothes'),
+                Tab(text: 'Outfits'),
+              ],
+            ),
+          ),
         ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _buildClothesContent(filteredItems),
+          _buildOutfitsContent(),
+        ],
       ),
     );
   }
@@ -472,7 +315,7 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> with SingleTick
         // Categories
         SliverToBoxAdapter(
           child: Container(
-            height: 120,
+            height: 90,
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
@@ -489,11 +332,11 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> with SingleTick
         
         // Clothing Grid
         SliverPadding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           sliver: SliverGrid(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              mainAxisSpacing: 16,
+              mainAxisSpacing: 20,
               crossAxisSpacing: 16,
               childAspectRatio: 0.75,
             ),
@@ -521,15 +364,15 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> with SingleTick
         // Header
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+            padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   "AI Suggested Outfits",
                   style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 17,
+                    fontWeight: FontWeight.w600,
                     color: Colors.grey[800],
                   ),
                 ),
@@ -543,6 +386,7 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> with SingleTick
                     style: TextStyle(
                       color: AppTheme.primaryGold,
                       fontWeight: FontWeight.w600,
+                      fontSize: 13,
                     ),
                   ),
                 ),
@@ -575,13 +419,13 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> with SingleTick
 
   Widget _buildOutfitCard(Map<String, dynamic> outfit) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 20),
+      margin: const EdgeInsets.only(bottom: 24),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withOpacity(0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -596,13 +440,13 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> with SingleTick
                 height: 200,
                 decoration: BoxDecoration(
                   borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(16),
+                    top: Radius.circular(20),
                   ),
-                  color: Colors.grey[100],
+                  color: Colors.grey[50],
                 ),
                 child: ClipRRect(
                   borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(16),
+                    top: Radius.circular(20),
                   ),
                   child: Image.asset(
                     outfit['image'],
@@ -653,7 +497,7 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> with SingleTick
             ],
           ),
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -706,7 +550,7 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> with SingleTick
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
                 Row(
                   children: [
                     Expanded(
@@ -729,7 +573,7 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> with SingleTick
                           side: BorderSide(color: AppTheme.primaryGold),
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(16),
                           ),
                         ),
                       ),
@@ -755,7 +599,7 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> with SingleTick
                           backgroundColor: AppTheme.primaryGold,
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(16),
                           ),
                         ),
                       ),
@@ -772,55 +616,44 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> with SingleTick
 
   Widget _buildClothingItem(Map<String, dynamic> item) {
     return Container(
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[300]!, width: 1),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 6,
             offset: const Offset(0, 2),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: Stack(
+        borderRadius: BorderRadius.circular(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.asset(
-              item['image'],
-              width: double.infinity,
-              height: double.infinity,
-              fit: BoxFit.contain,
+            Expanded(
+              child: Container(
+                color: Colors.grey[50],
+                child: Image.asset(
+                  item['image'],
+                  width: double.infinity,
+                  fit: BoxFit.contain,
+                ),
+              ),
             ),
-            // Positioned(
-            //   bottom: 0,
-            //   left: 0,
-            //   right: 0,
-            //   child: Container(
-            //     padding: const EdgeInsets.all(12),
-            //     decoration: BoxDecoration(
-            //       gradient: LinearGradient(
-            //         begin: Alignment.topCenter,
-            //         end: Alignment.bottomCenter,
-            //         colors: [
-            //           Colors.transparent,
-            //           Colors.black.withOpacity(0.7),
-            //         ],
-            //       ),
-            //     ),
-            //     child: Text(
-            //       item['name'],
-            //       style: const TextStyle(
-            //         color: Colors.white,
-            //         fontSize: 14,
-            //         fontWeight: FontWeight.w500,
-            //       ),
-            //     ),
-            //   ),
-            // ),
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Text(
+                item['name'],
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
       ),
@@ -828,6 +661,10 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> with SingleTick
   }
 
   Widget _buildCategoryItem(Map<String, dynamic> category, bool isSelected) {
+    // Define colors based on category
+    final List<Color> gradient = category['gradient'] ?? [Colors.purple.shade300, Colors.purple.shade500];
+    Color textColor = Colors.white;
+    
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -835,73 +672,63 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> with SingleTick
         });
       },
       child: Container(
-        margin: const EdgeInsets.only(right: 20),
+        margin: const EdgeInsets.only(right: 12),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeInOut,
-              width: 56,
-              height: 56,
+              constraints: const BoxConstraints(
+                minWidth: 110,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white,
-                border: Border.all(
-                  color: isSelected ? AppTheme.primaryGold : Colors.grey[300]!,
-                  width: isSelected ? 2 : 1,
+                gradient: LinearGradient(
+                  colors: isSelected ? gradient : [Colors.grey.shade200, Colors.grey.shade300],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-                boxShadow: isSelected
-                    ? [
-                        BoxShadow(
-                          color: AppTheme.primaryGold.withOpacity(0.2),
-                          blurRadius: 8,
-                          spreadRadius: 1,
-                          offset: const Offset(0, 2),
-                        ),
-                      ]
-                    : [],
+                borderRadius: BorderRadius.circular(50),
+                boxShadow: isSelected ? [
+                  BoxShadow(
+                    color: gradient[0].withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  )
+                ] : [],
               ),
-              child: Icon(
-                category['icon'],
-                color: isSelected ? AppTheme.primaryGold : Colors.grey[400],
-                size: 24,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              category['label'],
-              style: TextStyle(
-                color: isSelected ? Colors.black87 : Colors.grey[600],
-                fontSize: 12,
-                fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: isSelected ? Colors.white.withOpacity(0.2) : Colors.white.withOpacity(0.7),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      category['icon'],
+                      color: isSelected ? Colors.white : Colors.black54,
+                      size: 18,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    category['label'],
+                    style: TextStyle(
+                      color: isSelected ? Colors.white : Colors.black54,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildStat(String value, String label) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey[600],
-          ),
-        ),
-      ],
     );
   }
 
