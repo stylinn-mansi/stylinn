@@ -1,10 +1,14 @@
 {
   "version": 2,
+  "framework": "static",
   "outputDirectory": "build/web",
-  "public": true,
-  "cleanUrls": true,
   "routes": [
-    { "handle": "filesystem" },
+    { "src": "/assets/(.*)", "dest": "/assets/$1" },
+    { "src": "/favicon.png", "dest": "/favicon.png" },
+    { "src": "/flutter.js", "dest": "/flutter.js" },
+    { "src": "/flutter_service_worker.js", "dest": "/flutter_service_worker.js" },
+    { "src": "/main.dart.js", "dest": "/main.dart.js" },
+    { "src": "/manifest.json", "dest": "/manifest.json" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 } 
